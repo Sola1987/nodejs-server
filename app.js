@@ -1,3 +1,5 @@
+'use strict';
+
 const Server = require('./server');
 
 const SERVER = { host: 'localhost', port: 3000 };

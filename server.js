@@ -1,3 +1,5 @@
+'use strict';
+
 const
 	Events = require('events'),
 	http = require('http'),

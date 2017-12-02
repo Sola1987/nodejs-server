@@ -8,5 +8,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node ."
+  },
+  "dependencies": {
+
   }
 }

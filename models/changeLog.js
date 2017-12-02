@@ -1,3 +1,5 @@
+'use strict';
+
 class changeLog {
 	constructor(server) {
 		this.server = server,
