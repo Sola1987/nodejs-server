@@ -11,7 +11,9 @@ class changeLog {
 	}
 
 	findLastChange(key, timestamp) {
-		return this.model.findOne({key: key, timestamp: {$lte: timestamp}}).sort({timestamp: -1});
+		const filter = { key: key };
+		if (timestamp > 0) filter.timestamp = { $lte: timestamp };
+		return this.model.findOne(filter).sort({timestamp: -1});
 	}
 }
 

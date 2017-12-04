@@ -57,19 +57,27 @@ class Server extends Events{
       			res.end(errorReturn);
 		    }
 	  	} else if (req.method === "GET") {
-	  		const parsedUrl = req.url.split('?');
-	  		if (parsedUrl[0] === "/object/age") {
+	  		const urlParts = this.parseUrl(req.url);
+	  		if (urlParts.objectName === 'object' &&  urlParts.objectKey) {
 	  			let timestamp = 0;
-	  			if (parsedUrl[1]) timestamp = querystring.parse(parsedUrl[1]).timestamp;
-	  			res.writeHead(200, { 'Content-Type': 'application/json' });
+	  			if (urlParts.params) timestamp = urlParts.params.timestamp;
 	    		const object = new myObject(this);
-	    		object.getByKey('age', timestamp).then(obj => {
-	    			res.end(JSON.stringify(this.format(obj, 'get')));
+	    		object.getByKey(urlParts.objectKey, timestamp).then(obj => {
+	    			if (obj) {
+	    				res.writeHead(200, { 'Content-Type': 'application/json' });
+	    				res.end(JSON.stringify(this.format(obj, 'get')));
+	    			} else {
+	    				res.writeHead(404, {'Content-Type': 'text/html'});
+      					res.end(errorReturn);
+	    			}
 	    		});
 		    } else {
 		      	res.writeHead(404, {'Content-Type': 'text/html'});
       			res.end(errorReturn);
 		    }
+	  	} else {
+	  		res.writeHead(404, {'Content-Type': 'text/html'});
+  			res.end(errorReturn);
 	  	}
 	}
 
@@ -90,6 +98,21 @@ class Server extends Events{
 				}
 			});
 		});
+	}
+
+	parseUrl(url) {
+		const urlParts = { objectName: null, objectKey: null, params: null };
+		const parsedUrl = url.split('?');
+  		if (parsedUrl[0]) {
+  			const parsedSubUrl = parsedUrl[0].split('/');
+  			if (parsedSubUrl.length >= 2) {
+  				urlParts.objectName = parsedSubUrl[1];
+  				if (parsedSubUrl[2]) urlParts.objectKey = parsedSubUrl[2];
+  			}
+  		}
+  		if (parsedUrl[1]) urlParts.params = querystring.parse(parsedUrl[1]);
+
+  		return urlParts;
 	}
 
 	format(obj, method) {
